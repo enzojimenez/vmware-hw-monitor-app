@@ -1,8 +1,8 @@
 replicaCount: 1
 image:
-  repository: enzojimenez/vmware-hw-monitor-app
+  repository: 386235758526.dkr.ecr.us-east-1.amazonaws.com/vmware-hw-monitor-app
   pullPolicy: Always
-  tag: "0.1.2"
+  tag: "0.1.3"
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
