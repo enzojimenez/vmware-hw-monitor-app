@@ -6,7 +6,7 @@ on:
       - '.github/workflows/vmware-hw-monitor-app.yaml'
     branches: [ "main" ]
 env:
-  APP_VERSION: "0.1.2"
+  APP_VERSION: "0.1.3"
   APP_NAME: "vmware-hw-monitor-app"
   CLUSTER_NAME: "k8s-enzo"
   DNS_DOMAIN: "minube.cr"
@@ -75,6 +75,7 @@ jobs:
     steps:
       - name: "Update YAML files for ${{ env.APP_NAME }} Application - ArgoCD"
         run: |
+          yq -i '.image.repository = "${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP_NAME }}"' "helm/${{ env.APP_NAME }}/values.yaml"
           yq -i '.image.tag = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/values.yaml"
           yq -i '.version = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/Chart.yaml"
           yq -i '.appVersion = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/Chart.yaml"
