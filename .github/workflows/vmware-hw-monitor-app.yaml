@@ -1,0 +1,83 @@
+name: vmware-hw-monitor-app
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/vmware-hw-monitor-app.yaml'
+    branches: [ "main" ]
+env:
+  APP_VERSION: "0.1.2"
+  APP_NAME: "vmware-hw-monitor-app"
+  CLUSTER_NAME: "k8s-enzo"
+  DNS_DOMAIN: "minube.cr"
+  AWS_REGION: "us-east-1"
+  NAMESPACE: "monitoring"
+  AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+jobs:
+  code-checkout:
+    runs-on: ec2-app
+    steps:
+      - name: "Checkout Repository Code"
+        uses: actions/checkout@v3
+      - run: echo "Repository has been cloned"
+  check-versions:
+    runs-on: ec2-app
+    needs: code-checkout
+    steps:
+      - name: "Check Toolbox versions"
+        run: |
+          aws --version
+          helm version --short | cut -d + -f 1
+          docker version
+          docker ps
+          kubectl version --short --client
+          python3 --version
+  run-tests:
+    runs-on: ec2-app
+    needs: [code-checkout, check-versions]
+    steps:
+      - name: "Run Python Tests"
+        run: |
+          python3 -m unittest -v tests.test_app
+  docker-build-tag-push:
+    runs-on: ec2-app
+    needs: run-tests
+    steps:
+      - name: "Docker Build"
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login \
+          --username AWS --password-stdin ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          docker build -t ${{ env.APP_NAME }} .
+          docker tag ${{ env.APP_NAME }}:latest \
+          ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP_NAME }}:${{ env.APP_VERSION }}
+          docker push ${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.APP_NAME }}:${{ env.APP_VERSION }}
+  update-kubeconfig:
+    runs-on: ec2-app
+    needs: docker-build-tag-push
+    steps:
+      - name: "Update KubeConfig"
+        run: |
+          aws eks update-kubeconfig --name ${{ env.CLUSTER_NAME }} --region=${{ env.AWS_REGION }}
+  deploy-app-to-k8s:
+    runs-on: ec2-app
+    needs: update-kubeconfig
+    steps:
+      - name: "AWS ECR token refresh & Helm Deploy ${{ env.APP_NAME }} Application to Kubernetes"
+        run: |
+          kubectl delete secret regcred --namespace=${{ env.NAMESPACE }} --ignore-not-found
+          kubectl create secret docker-registry regcred \
+          --docker-server=${{ env.AWS_ACCOUNT }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com \
+          --docker-username=AWS --docker-password=$(aws ecr get-login-password --region ${{ env.AWS_REGION }}) \
+          --namespace=${{ env.NAMESPACE }}
+  gitops-helm-update:
+    runs-on: ec2-app
+    needs: update-kubeconfig
+    steps:
+      - name: "Update YAML files for ${{ env.APP_NAME }} Application - ArgoCD"
+        run: |
+          yq -i '.image.tag = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/values.yaml"
+          yq -i '.version = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/Chart.yaml"
+          yq -i '.appVersion = "${{ env.APP_VERSION }}"' "helm/${{ env.APP_NAME }}/Chart.yaml"
+          git add helm/${{ env.APP_NAME }}/values.yaml
+          git add helm/${{ env.APP_NAME }}/Chart.yaml
+          git commit -m "EC2 Pipeline running for new version ${{ env.APP_VERSION }}" && git push
