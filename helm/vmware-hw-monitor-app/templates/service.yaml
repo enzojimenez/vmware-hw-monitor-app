@@ -4,6 +4,10 @@ metadata:
   name: {{ include "vmware-hw-monitor-app.fullname" . }}
   labels:
     {{- include "vmware-hw-monitor-app.labels" . | nindent 4 }}
+  { { - with .Values.serviceAnnotations } }
+  annotations:
+    { { - toYaml . | nindent 4 } }
+  { { - end } }
 spec:
   type: {{ .Values.service.type }}
   ports:

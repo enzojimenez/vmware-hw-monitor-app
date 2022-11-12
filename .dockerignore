@@ -4,3 +4,4 @@ argocd/
 helm/
 
 Dockerfile
+app/config.json

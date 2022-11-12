@@ -1,0 +1,17 @@
+{
+  "sleep": 10,
+  "urls": [
+    "https://httpstat.us/200",
+    "https://httpstat.us/503"
+  ],
+  "metrics": [
+    {
+      "name": "sample_external_url_up",
+      "help": "Is UP and responding 200 OK?"
+    },
+    {
+      "name": "sample_external_url_response_ms",
+      "help": "Response in Milliseconds"
+    }
+  ]
+}
