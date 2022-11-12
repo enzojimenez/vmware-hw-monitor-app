@@ -10,15 +10,15 @@ serviceAccount:
   create: true
   annotations: {}
   name: ""
-serviceAnnotations:
-  prometheus.io/port: '9877'
-  prometheus.io/scrape: 'true'
 podAnnotations: {}
 podSecurityContext: {}
 securityContext: {}
 service:
   type: ClusterIP
   port: 80
+  annotations:
+    prometheus.io/port: '9877'
+    prometheus.io/scrape: 'true'
 ingress:
   enabled: true
   ingressClassName: nginx
