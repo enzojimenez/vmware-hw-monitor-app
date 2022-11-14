@@ -1,12 +1,14 @@
-# docker build -t enzojimenez/vmware-hw-monitor-app .
+# docker build -t enzojimenez/vmware-hw-monitor-app:TAG .
 FROM python:3.7.15-bullseye
 
-COPY ./app /opt/app
+RUN mkdir /monitor-app
 
-WORKDIR /opt/app
+COPY app /monitor-app
+
+WORKDIR /monitor-app
 
 RUN pip install -r requirements.txt
 
 EXPOSE 9877
 
-CMD ["python3", "/opt/app/main.py"]
+CMD ["python3", "main.py"]
