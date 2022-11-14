@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 9877
 
-CMD ["python3", "main.py"]
+CMD ["python3", "/opt/app/main.py"]
