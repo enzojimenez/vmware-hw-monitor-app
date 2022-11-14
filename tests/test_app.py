@@ -7,6 +7,7 @@ from requests import Response
 from unittest import TestCase, mock, main
 from app.main import HttpMonitorExporter
 from prometheus_client.core import Gauge
+from prometheus_client.parser import text_string_to_metric_families
 
 
 def mocked_requests_get(*args, **kwargs):
@@ -69,11 +70,14 @@ class TestHttpMonitorExporter(TestCase):
                 # Validate the previous created gauges as InstanceOf Gauge
                 self.assertIsInstance(gauge, Gauge)
 
-                value = self.app.registry.get_sample_value(metric, {'url': self.last_url})
-                if "up" in metric:
-                    self.assertEqual(int(value), 1 if self.app.response.status_code == 200 else 0)
-                if "response_ms" in metric:
-                    self.assertEqual(value, self.app.response.elapsed.microseconds / 1000)
+                # Test assertions only on the last url checks
+                for m in gauge.collect():
+                    for s in m.samples:
+                        if self.last_url == s.labels['url']:
+                            if "up" in metric:
+                                self.assertEqual(int(s.value), 1 if self.app.response.status_code == 200 else 0)
+                            if "response_ms" in metric:
+                                self.assertEqual(s.value, self.app.response.elapsed.microseconds / 1000)
 
 
 if __name__ == '__main__':

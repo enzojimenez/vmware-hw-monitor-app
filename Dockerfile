@@ -1,3 +1,4 @@
+# docker build -t enzojimenez/vmware-hw-monitor-app .
 FROM python:3.7.15-bullseye
 
 COPY ./app /opt/app

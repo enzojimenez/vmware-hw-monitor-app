@@ -4,14 +4,14 @@ import json
 import logging
 import requests
 
-from prometheus_client import start_http_server, Gauge, CollectorRegistry
+from prometheus_client import start_http_server, Gauge
 
 # Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class HttpMonitorExporter:
     def __init__(self) -> None:
-        self.registry = CollectorRegistry()
         self.config = {}
         self.metrics = {}
         self.response = None
@@ -22,7 +22,7 @@ class HttpMonitorExporter:
 
     def create_gauge_for_metric(self, metric_name, metric_help):
         if self.metrics.get(metric_name) is None:
-            self.metrics[metric_name] = Gauge(metric_name, metric_help, ['url'], registry=self.registry)
+            self.metrics[metric_name] = Gauge(metric_name, metric_help, ['url'])
 
     def check_url(self, url) -> requests.Response:
         try:
