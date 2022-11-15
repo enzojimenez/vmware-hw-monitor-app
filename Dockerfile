@@ -1,11 +1,9 @@
 # docker build -t enzojimenez/vmware-hw-monitor-app:TAG .
 FROM python:3.7.15-bullseye
 
-RUN mkdir /monitor-app
+COPY app/ /opt/app/
 
-COPY app /monitor-app
-
-WORKDIR /monitor-app
+WORKDIR /opt/app
 
 RUN pip install -r requirements.txt
 
