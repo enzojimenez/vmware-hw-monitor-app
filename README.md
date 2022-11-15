@@ -112,8 +112,8 @@ CMD ["python3", "main.py"]
    > kubectl --namespace monitoring get pods -l "release=kube-prometheus-stack"
 5. When all pods are running, then clone the solution repo:
    > git clone https://github.com/enzojimenez/vmware-hw-monitor-app.git
-6. Enter the repo folder:
-   > cd vmware-hw-monitor-app
+6. Enter the helm folder:
+   > cd vmware-hw-monitor-app/helm
 7. Now install the Python monitor-app in the namespace monitoring:
    > helm install monitoring-app vmware-hw-monitor-app -n monitoring
 8. Check the monitor app's service:
