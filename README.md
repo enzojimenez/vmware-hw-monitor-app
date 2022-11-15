@@ -48,6 +48,7 @@ CMD ["python3", "main.py"]
   * Workflow: <a href="https://github.com/enzojimenez/vmware-hw-monitor-app/blob/main/.github/workflows/vmware-hw-monitor-app.yaml" target="_blank">.github/workflows/vmware-hw-monitor-app.yaml</a>
 * GitOps: http://argo.k8s.azure.co.cr/applications
   * Argo App: <a href="https://github.com/enzojimenez/vmware-hw-monitor-app/blob/main/argocd/application.yaml" target="_blank">argocd/application.yaml</a>
+* Security: SSL Encryption (Cloudflare integration with Origin Issuer)
 * Diagram: <img src="images/deployment_ci_cd.png" />
 * Note: THIS IS RUN AS PART OF A TRIGGERED PIPELINE
 
@@ -81,7 +82,7 @@ CMD ["python3", "main.py"]
 * Targets: http://prometheus.k8s.azure.co.cr/targets?search=#pool-kubernetes-service-endpoints
   * <img src="images/prometheus_endpoints.png" alt="" />
 * Python Library: https://github.com/prometheus/client_python
-* OPTIONAL: Exposed metrics -> 
+* OPTIONAL: Exposed metrics -> https://vmware-hw-monitor-app.minube.cr/metrics
 
 <hr>
 
