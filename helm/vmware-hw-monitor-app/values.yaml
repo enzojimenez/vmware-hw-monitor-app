@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: 386235758526.dkr.ecr.us-east-1.amazonaws.com/vmware-hw-monitor-app
   pullPolicy: Always
-  tag: "0.1.7"
+  tag: "0.1.8"
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
